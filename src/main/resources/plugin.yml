@@ -1,0 +1,11 @@
+name: FastBridge
+main: de.g3sit.fastbridge.FastBridgePlugin
+version: 0.1.0
+author: G3sit
+description: A Plugin to add a FastBridge gamemode. Times to complete the Bridge are saved in a scoreboard
+commands:
+  fb:
+    description: Root Command for all actions the fb plugin needs
+    aliases: [fastbridge]
+    permission: fastbridge.use
+    permission-message: You are not allowed to use the fastbridge plugin
