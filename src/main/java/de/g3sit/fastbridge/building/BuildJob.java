@@ -1,8 +1,17 @@
 package de.g3sit.fastbridge.building;
 
-import java.util.List;
+import java.util.Iterator;
 
-public interface BuildJob {
+public interface BuildJob extends Iterable<BuildInstruction> {
 
-    public List<BuildInstruction> getInstructions();
+    /**
+     * returns the size of the BuildJob
+     * @return amount of needed BuildInstructions
+     */
+    int size();
+
+    @Override
+    Iterator<BuildInstruction> iterator();
+
+    BuildJobIterator buildJobIterator();
 }
