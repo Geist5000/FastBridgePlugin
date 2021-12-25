@@ -75,11 +75,13 @@ public class FastBridgePlugin extends JavaPlugin {
 
     private void startScheduler() {
         this.playerTimeScheduler = new PlayerTimeScheduler(this.getGameManager());
-        this.playerTimeScheduler.runTaskTimer(this,0,3);
+        // TODO change if to synchronous timer if issues occur
+        this.playerTimeScheduler.runTaskTimerAsynchronously(this,0,3);
     }
 
     @Override
     public void onDisable() {
+        this.playerTimeScheduler.cancel();
         super.onDisable();
     }
 
