@@ -1,5 +1,9 @@
 package de.g3sit.fastbridge;
 
+import de.g3sit.fastbridge.commands.PlayCommand;
+import de.g3sit.fastbridge.commands.utils.MultiCommand;
+import de.g3sit.fastbridge.commands.utils.PlayerCommand;
+import de.g3sit.fastbridge.data.game.PlayerGameState;
 import de.g3sit.fastbridge.listeners.BlockListeners;
 import de.g3sit.fastbridge.scheduler.PlayerTimeScheduler;
 import org.bukkit.command.Command;
@@ -38,22 +42,31 @@ public class FastBridgePlugin extends JavaPlugin {
     private void registerCommands() {
         PluginCommand fbCommand = getCommand("fb");
         if (!Objects.isNull(fbCommand)) {
-            fbCommand.setExecutor(new CommandExecutor() {
+            MultiCommand multiCommand = new MultiCommand();
+
+            multiCommand.setCommandExecutor("play",new PlayCommand(this.getGameManager()));
+
+            multiCommand.setCommandExecutor("debug",new PlayerCommand() {
                 @Override
-                public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-                    GameManager gameManager = FastBridgePlugin.this.getGameManager();
-                    if (sender instanceof Player) {
-                        Player player = (Player) sender;
-                        if (gameManager.isPlaying(player)) {
-                            gameManager.stopTimer(player);
+                public boolean onPlayerCommand(Player player, Command command, String label, String[] args) {
+                    if (gameManager.isPlaying(player)) {
+                        if(gameManager.getGame(player).getState() == PlayerGameState.POST_GAME){
+                            gameManager.resetGame(player);
                         }else{
-                            gameManager.createGame(player);
-                            player.sendMessage("Game started");
+                            gameManager.stopTimer(player);
                         }
+
+                    }else{
+                        gameManager.createGame(player);
+                        gameManager.startTimer(player);
+                        player.sendMessage("Game started");
                     }
-                    return true;
+                    return false;
                 }
             });
+
+            multiCommand.register(fbCommand);
+
         } else {
             getLogger().warning("fb command isn't registered. No FastBridge commands work");
         }

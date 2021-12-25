@@ -1,13 +1,15 @@
 package de.g3sit.fastbridge.commands.utils;
 
+import de.g3sit.fastbridge.FastBridgePlugin;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 
 import java.util.*;
 
 public class MultiCommand implements CommandExecutor, TabCompleter {
-    private final HashMap<String, CommandExecutor> commands;
+    private final HashMap<String,CommandExecutor> commands;
     private CommandExecutor fallback;
 
     public MultiCommand() {
@@ -17,11 +19,12 @@ public class MultiCommand implements CommandExecutor, TabCompleter {
 
     public void register(PluginCommand command) {
         command.setExecutor(this);
-        command.setTabCompleter(this);
     }
 
     /**
      * Sets the command executor for the given Command
+     *
+     * TODO accept TabCompleter
      * @param command name of the command
      * @param executor if this is null, the given command is removed
      */
@@ -60,7 +63,12 @@ public class MultiCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        return null;
+        Bukkit.getLogger().info("Command alias: " + alias);
+        Bukkit.getLogger().info(Arrays.toString(args));
+        if(args.length != 1){
+            return null;
+        }
+        return this.commands.keySet().stream().filter((c)->c.startsWith(args[0])).toList();
     }
 
     public static class FallbackCommand implements CommandExecutor {
