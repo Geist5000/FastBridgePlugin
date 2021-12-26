@@ -3,6 +3,7 @@ package de.g3sit.fastbridge;
 import de.g3sit.fastbridge.commands.PlayCommand;
 import de.g3sit.fastbridge.commands.utils.MultiCommand;
 import de.g3sit.fastbridge.commands.utils.PlayerCommand;
+import de.g3sit.fastbridge.data.db.FastBridgeDatabase;
 import de.g3sit.fastbridge.data.game.PlayerGameState;
 import de.g3sit.fastbridge.listeners.BlockListeners;
 import de.g3sit.fastbridge.scheduler.PlayerTimeScheduler;
@@ -20,14 +21,21 @@ public class FastBridgePlugin extends JavaPlugin {
 
     private GameManager gameManager;
     private PlayerTimeScheduler playerTimeScheduler;
+    private FastBridgeDatabase database;
 
     @Override
     public void onEnable() {
         super.onEnable();
         this.gameManager = new GameManager(this);
+
+        this.openDatabase();
         this.registerEvents();
         this.registerCommands();
         this.startScheduler();
+    }
+
+    public void openDatabase(){
+        this.database = new FastBridgeDatabase();
     }
 
     public GameManager getGameManager() {
