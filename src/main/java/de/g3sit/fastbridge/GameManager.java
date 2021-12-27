@@ -4,19 +4,21 @@ import de.g3sit.fastbridge.data.game.PlayerGame;
 import de.g3sit.fastbridge.data.game.PlayerGameState;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GameManager {
 
     private FastBridgePlugin plugin;
+    private Map<Player, PlayerGame> playerGames;
 
     public GameManager(FastBridgePlugin plugin) {
         this.plugin = plugin;
-        this.playerGames = new HashMap<>();
+        this.playerGames = new ConcurrentHashMap<>();
     }
 
-    private HashMap<Player, PlayerGame> playerGames;
+
 
     public boolean isPlaying(Player player) {
         return playerGames.containsKey(player);
@@ -33,7 +35,7 @@ public class GameManager {
         this.playerGames.put(player,playerGame);
     }
 
-    public HashMap<Player, PlayerGame> getPlayerGames() {
+    public Map<Player, PlayerGame> getPlayerGames() {
         return this.playerGames;
     }
 

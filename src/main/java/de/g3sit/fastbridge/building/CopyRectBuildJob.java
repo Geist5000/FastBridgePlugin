@@ -23,7 +23,7 @@ public class CopyRectBuildJob implements BuildJob {
     private Location oldMax;
 
     /**
-     * Creates a new CopyRectBuildJob, sourceStart and sourceEnd needs to be the same size
+     * Creates a new CopyRectBuildJob, source and destination needs to be the same size
      *
      * @param sourceStart      start location of the source area
      * @param sourceEnd        end location of the source area

@@ -63,8 +63,7 @@ public class MultiCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        Bukkit.getLogger().info("Command alias: " + alias);
-        Bukkit.getLogger().info(Arrays.toString(args));
+
         if(args.length != 1){
             return null;
         }

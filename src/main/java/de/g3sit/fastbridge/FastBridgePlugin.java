@@ -1,5 +1,8 @@
 package de.g3sit.fastbridge;
 
+import de.g3sit.fastbridge.building.BuildJob;
+import de.g3sit.fastbridge.building.BuilderManager;
+import de.g3sit.fastbridge.building.CopyRectBuildJob;
 import de.g3sit.fastbridge.commands.PlayCommand;
 import de.g3sit.fastbridge.commands.utils.MultiCommand;
 import de.g3sit.fastbridge.commands.utils.PlayerCommand;
@@ -15,16 +18,19 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class FastBridgePlugin extends JavaPlugin {
 
     private GameManager gameManager;
+    private BuilderManager builderManager;
     private PlayerTimeScheduler playerTimeScheduler;
 
     @Override
     public void onEnable() {
         super.onEnable();
         this.gameManager = new GameManager(this);
+        this.builderManager = new BuilderManager(this);
         this.registerEvents();
         this.registerCommands();
         this.startScheduler();
@@ -49,19 +55,14 @@ public class FastBridgePlugin extends JavaPlugin {
             multiCommand.setCommandExecutor("debug",new PlayerCommand() {
                 @Override
                 public boolean onPlayerCommand(Player player, Command command, String label, String[] args) {
-                    if (gameManager.isPlaying(player)) {
-                        if(gameManager.getGame(player).getState() == PlayerGameState.POST_GAME){
-                            gameManager.resetGame(player);
-                        }else{
-                            gameManager.stopTimer(player);
+                    int size = Integer.parseInt(args[0]);
+                    builderManager.queueBuildJob(new CopyRectBuildJob(player.getLocation(), player.getLocation().add(size, size, size), player.getLocation().add(size, 0, size), player.getLocation().add(size*2, size, size*2)), new Consumer<BuildJob>() {
+                        @Override
+                        public void accept(BuildJob buildInstructions) {
+                            player.sendMessage("build finished");
                         }
-
-                    }else{
-                        gameManager.createGame(player);
-                        gameManager.startTimer(player);
-                        player.sendMessage("Game started");
-                    }
-                    return false;
+                    });
+                    return true;
                 }
             });
 

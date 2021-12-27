@@ -11,16 +11,17 @@ import java.util.function.Consumer;
 public class BuilderManager {
 
     private static final int WORKER_COUNT = 5;
-    private static final int WORKER_DELAY = 10;
-    private static final int WORKER_SPEED = 1;
-    private Plugin plugin;
+    private static final int WORKER_DELAY = 1;
+    private static final int WORKER_SPEED = 100;
+    private final Plugin plugin;
 
     private final List<BuilderWorker> worker;
     private final HashMap<BuildJob,Consumer<BuildJob>> buildJobFinishedCallbacks;
 
-    public BuilderManager() {
+    public BuilderManager(Plugin plugin) {
         this.worker = new LinkedList<>();
         this.buildJobFinishedCallbacks = new HashMap<>();
+        this.plugin = plugin;
     }
 
 

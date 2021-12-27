@@ -2,6 +2,7 @@ package de.g3sit.fastbridge.commands;
 
 import de.g3sit.fastbridge.GameManager;
 import de.g3sit.fastbridge.commands.utils.PlayerCommand;
+import de.g3sit.fastbridge.data.game.PlayerGameState;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 
@@ -15,7 +16,18 @@ public class PlayCommand extends PlayerCommand {
 
     @Override
     public boolean onPlayerCommand(Player player, Command command, String label, String[] args) {
-        this.gameManager.createGame(player);
-        return false;
+        if (gameManager.isPlaying(player)) {
+            if(gameManager.getGame(player).getState() == PlayerGameState.POST_GAME){
+                gameManager.resetGame(player);
+            }else{
+                gameManager.stopTimer(player);
+            }
+
+        }else{
+            gameManager.createGame(player);
+            gameManager.startTimer(player);
+            player.sendMessage("Game started");
+        }
+        return true;
     }
 }

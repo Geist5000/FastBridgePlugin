@@ -55,32 +55,42 @@ public class BuilderWorker extends BukkitRunnable {
 
     public int getInstructionCount(){
         int result = this.buildJobs.stream().map(BuildJob::size).reduce(Integer::sum).orElse(0);
-        if(!Objects.isNull(this.currentInstructionIterator))
+        if(Objects.nonNull(this.currentInstructionIterator))
             result+= this.currentInstructionIterator.remaining();
         return  result;
     }
 
+    public boolean hasWork(){
+        return hasCurrentWork() || !this.buildJobs.empty();
+    }
+
+    public boolean hasCurrentWork(){
+        return Objects.nonNull(this.currentInstructionIterator) && currentInstructionIterator.hasNext();
+    }
+
     @Override
     public void run() {
-        int processed = 0;
-        while((!Objects.isNull(currentInstructionIterator) && currentInstructionIterator.hasNext()) && processed < this.getSpeed()){
 
+        long processed = 0;
+        while(hasCurrentWork() && processed < this.getSpeed()){
 
-            if(currentInstructionIterator.hasNext()){
+            if(Objects.nonNull(currentInstructionIterator) && currentInstructionIterator.hasNext()){
                 BuildInstruction currentInstruction = currentInstructionIterator.next();
                 currentInstruction.perform();
                 processed++;
-            }else{
-                if(!this.nextBuildJob()){
-                    return;
-                }
             }
         }
 
-
-        if(this.buildJobs.empty()){
-            this.nextBuildJob();
+        if(!hasCurrentWork()){
+            this.finishCurrentBuildJob();
         }
+
+        if(hasWork()){
+            this.nextBuildJob();
+        }else{
+            this.stopSelf();
+        }
+        Bukkit.getLogger().info("one build cycle finished run " + processed + " build instructions while having speed of " + getSpeed());
     }
 
     /**
@@ -89,15 +99,17 @@ public class BuilderWorker extends BukkitRunnable {
      * If no BuildJob is left, this worker is stopped
      *
      */
-    private boolean nextBuildJob(){
-        this.onBuildFinishedCallback.accept(currentBuildJob);
+    private void nextBuildJob(){
         if(!this.buildJobs.empty()){
             this.setCurrentBuildJob(this.buildJobs.pop());
-            return true;
-        }else{
-            this.stopSelf();
-            return false;
         }
+    }
+
+    private void finishCurrentBuildJob(){
+        if(Objects.nonNull(currentBuildJob))
+            this.onBuildFinishedCallback.accept(currentBuildJob);
+        this.currentBuildJob = null;
+        this.currentInstructionIterator = null;
     }
 
 
